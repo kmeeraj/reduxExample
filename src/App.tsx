@@ -1,25 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useCallback} from 'react';
 import './App.css';
+import {shallowEqual, useDispatch, useSelector} from "react-redux";
+import {Dispatch} from "redux";
+import {addCourse, removeCourse} from "./store/actionCreators";
+import {AddCourse} from "./components/AddCourse";
+import {Course} from "./components/Course";
+import {Card, Elevation} from "@blueprintjs/core";
 
-function App() {
+const App = () => {
+  const courses : readonly ICourse[] = useSelector(
+      (state: CourseState) => state.courses,
+      shallowEqual
+  );
+  const dispatch: Dispatch<any> = useDispatch();
+  const saveCourse = useCallback(
+      (course: ICourse) => dispatch(addCourse(course)),
+      [dispatch]
+  )
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <main>
+        <h1>My Courses</h1>
+          <Card key='Main Card'  elevation={Elevation.TWO}>
+        <AddCourse saveCourse={saveCourse} />
+        {courses.map((course: ICourse) => (
+            <Card key={course.id} elevation={Elevation.FOUR}>
+                <Course
+                    key={course.id}
+                    course={course}
+                    removeCourse={removeCourse}
+                />
+            </Card>
+        ))}
+          </Card>
+      </main>
   );
 }
 
